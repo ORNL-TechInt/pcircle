@@ -12,7 +12,7 @@ except: pass
 import sys, os, traceback, signal, codeop, tempfile
 from io import BytesIO
 from io import StringIO
-import pickle
+import _pickle as cPickle
 
 def pipename(pid):
     """Return name of pipe to use"""
@@ -24,16 +24,22 @@ class NamedPipe(object):
         with another process.  One process should pass 1 for end, and the
         other 0.  Data is marshalled with pickle."""
         self.in_name, self.out_name = name +'.in',  name +'.out',
+        print(self.in_name)
+        print(self.out_name)
+        print("end", end)
         try: os.mkfifo(self.in_name,mode)
         except OSError: pass
+        else: print("fifo in created")
         try: os.mkfifo(self.out_name,mode)
         except OSError: pass
+        else: print("fifo out created")
 
         # NOTE: The order the ends are opened in is important - both ends
         # of pipe 1 must be opened before the second pipe can be opened.
         if end:
-            self.inp = open(self.out_name,'r')
-            self.out = open(self.in_name,'w')
+            self.inp = os.open(self.out_name, os.O_RDONLY | os.O_NONBLOCK)
+            print("open for reading")
+            self.out = os.open(self.in_name, os.O_WRONLY)
         else:
             self.out = open(self.out_name,'w')
             self.inp = open(self.in_name,'r')
@@ -95,13 +101,13 @@ def remote_debug(sig,frame):
 
         try:
             while pipe.is_open() and _raiseEx.ex is None:
-                line = pipe.get()
+                line = pipe.get().decode('utf-8')
                 if line is None: continue # EOF
                 txt += line
                 try:
                     code = codeop.compile_command(txt)
                     if code:
-                        sys.stdout = cStringIO.StringIO()
+                        sys.stdout = StringIO()
                         sys.stderr = sys.stdout
                         exec(code, globs,locs) in globals(), locals()
                         txt = ''
@@ -110,7 +116,7 @@ def remote_debug(sig,frame):
                         pipe.put('... ')
                 except:
                     txt='' # May be syntax err.
-                    sys.stdout = cStringIO.StringIO()
+                    sys.stdout = StringIO()
                     sys.stderr = sys.stdout
                     traceback.print_exc()
                     pipe.put(sys.stdout.getvalue() + '>>> ')
@@ -127,10 +133,12 @@ def remote_debug(sig,frame):
 def debug_process(pid):
     """Interrupt a running process and debug it."""
     os.kill(pid, signal.SIGUSR1)  # Signal process.
+    print("kill signal sent")
     pipe = NamedPipe(pipename(pid), 1)
+    print("pipe", pipe)
     try:
         while pipe.is_open():
-            txt=raw_input(pipe.get()) + '\n'
+            txt=input(pipe.get().decode('utf-8')) + '\n'
             pipe.put(txt)
     except EOFError:
         pass # Exit.
@@ -145,6 +153,7 @@ def main():
         print("Error: Must provide process id to debug")
     else:
         pid = int(sys.argv[1])
+        print("pid", pid)
         debug_process(pid)
 
 

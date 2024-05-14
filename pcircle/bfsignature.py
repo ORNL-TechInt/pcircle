@@ -40,6 +40,7 @@ class BFsignature():
     def cal_positions(self, key):
         positions = []
         for i in range (self.k):
-            hashValue = zlib.crc32(key, i) % self.m
+            key_b = key.encode()
+            hashValue = zlib.crc32(key_b, i) % self.m
             positions.append(hashValue)
         return positions

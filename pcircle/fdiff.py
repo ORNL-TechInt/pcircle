@@ -8,7 +8,7 @@ import os
 
 from _version import get_versions
 from globals import G
-from itertools import izip_longest
+from itertools import zip_longest
 from fdef import ChunkSum
 __version__ = get_versions()['version']
 
@@ -60,10 +60,11 @@ def check_signature_file(f):
             sig.sha1 = line.split(":")[1].strip()
         elif line.startswith("src"):
             sig.prefix = line.split(":")[1].strip()
-        elif line.startswith("----block"):
-            block_checksum = True
+        #elif line.startswith("----block"):
+            #block_checksum = True
             break
-    if sig.prefix and sig.sha1 and block_checksum:
+    #if sig.prefix and sig.sha1 and block_checksum:
+    if sig.prefix and sig.sha1:
         return sig
     else:
         print("Error: [%s] is not a valid signature file." % f.name)

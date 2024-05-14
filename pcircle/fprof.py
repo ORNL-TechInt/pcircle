@@ -476,8 +476,7 @@ class ProfileWalk:
                                       (e, spath), extra=self.d)
                 else:
                     if stripe_count:
-                        os.write(stripe_out, "%-4s, %-10s, %s\n" %
-                                 (stripe_count, fsize, spath))
+                        stripe_out.write("%-4s, %-10s, %s\n" % (stripe_count, fsize, spath))
                         Tally.spcnt += 1
                     else:
                         self.logger.error(
@@ -707,20 +706,28 @@ def main():
     if args.lustre_stripe:
         G.lfs_bin = lfs.check_lfs()
         G.stripe_threshold = utils.conv_unit(args.stripe_threshold)
+       
+        try:
+            stripe_out = open(args.stripe_output, 'a')
+        except:
+            err_and_exit("Error: can't create stripe output: %s" %
+                         args.stripe_output)
+
+        '''
         try:
             stripe_out = os.open(args.stripe_output,
                                  os.O_CREAT | os.O_WRONLY | os.O_APPEND)
         except:
             err_and_exit("Error: can't create stripe output: %s" %
                          args.stripe_output)
-
+        '''
     if args.exclude:
         process_exclude_file()
 
     if comm.rank == 0:
-        print("Running Parameters:\n")
-        print("\t{0:<20}{1:<20}".format("fprof version:", __version__))
-        print("\t{0:<20}{1:<20}".format("Full rev id:", __revid__))
+        #print("Running Parameters:\n")
+        #print("\t{0:<20}{1:<20}".format("fprof version:", __version__))
+        #print("\t{0:<20}{1:<20}".format("Full rev id:", __revid__))
         print("\t{0:<20}{1:<20}".format("Num of hosts:", hosts_cnt))
         print("\t{0:<20}{1:<20}".format(
             "Num of processes:", MPI.COMM_WORLD.Get_size()))
@@ -822,7 +829,7 @@ def main():
     circle.finalize()
 
     if args.lustre_stripe and stripe_out:
-        os.close(stripe_out)
+        stripe_out.close()
 
         sp_workload = comm.gather(Tally.spcnt)
         if comm.rank == 0:

@@ -11,7 +11,7 @@ __author__ = 'f7b'
 import sys
 import sqlite3
 import hashlib
-from cStringIO import StringIO
+from io import StringIO
 from pcircle.utils import getLogger
 
 

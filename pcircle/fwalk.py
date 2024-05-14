@@ -427,15 +427,15 @@ def main():
                     "%0.2f%%" % percent, '∎' * star_count))
 
     if args.stats:
-        treewalk.flist.sort(lambda f1, f2: cmp(f1.st_size, f2.st_size), reverse=True)
+        treewalk.flist.sort(key = lambda f: f.st_size, reverse=True)
         globaltops = comm.gather(treewalk.flist[:args.top])
         if comm.rank == 0:
             globaltops = [item for sublist in globaltops for item in sublist]
-            globaltops.sort(lambda f1, f2: cmp(f1.st_size, f2.st_size), reverse=True)
+            globaltops.sort(key = lambda f: f.st_size, reverse=True)
             if len(globaltops) < args.top:
                 args.top = len(globaltops)
             print("\nStats, top %s files\n" % args.top)
-            for i in xrange(args.top):
+            for i in range(args.top):
                 print("\t{:15}{:<30}".format(utils.bytes_fmt(globaltops[i].st_size),
                       globaltops[i].path))
 

@@ -18,7 +18,7 @@ import signal
 import resource
 import sqlite3
 import math
-import cPickle as pickle
+import _pickle as cPickle
 from collections import Counter
 from threading import Thread
 from mpi4py import MPI
@@ -69,7 +69,7 @@ def gen_parser():
     parser = ThrowingArgumentParser(description="Parallel Data Copy",
                                      epilog="Please report issues to fwang2@ornl.gov")
     parser.add_argument("--version", action="version", version="{version}".format(version=__version__))
-    parser.add_argument("-v", "--verbosity", action="count", help="increase verbosity")
+    parser.add_argument("-v", "--verbosity", action="count", default=0, help="increase verbosity")
     parser.add_argument("--loglevel", default="error", help="log level, default ERROR")
     parser.add_argument("--chunksize", metavar="sz", default="1m", help="chunk size (KB, MB, GB, TB), default: 1MB")
     parser.add_argument("--adaptive", action="store_true", default=True, help="Adaptive chunk size")
@@ -378,7 +378,7 @@ class FCP(BaseTask):
             self.circle.workq.extend(self.circle.workq_buf)
             self.circle.workq_buf.clear()
             cobj = Checkpoint(self.src, self.dest, self.get_workq(), self.totalsize)
-            pickle.dump(cobj, f, pickle.HIGHEST_PROTOCOL)
+            cPickle.dump(cobj, f, -1)
         # POSIX requires rename to be atomic
         os.rename(tmp_file, self.checkpoint_file)
 
@@ -656,7 +656,7 @@ def prep_recovery():
         local_checkpoint_cnt = 1
         with open(chk_file, "rb") as f:
             try:
-                cobj = pickle.load(f)
+                cobj = cPickle.load(f)
                 sz = get_workq_size(cobj.workq)
                 src = cobj.src
                 dest = cobj.dest

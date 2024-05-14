@@ -37,7 +37,7 @@ def main():
             if offset == 0:
                 offset = random.randint(0, size)
             f.seek(offset)
-            f.write(sys.argv[2])
+            f.write(sys.argv[2].encode())
 
         print("Corrupted file at offset: %s\n" % offset)
     except Exception as e:

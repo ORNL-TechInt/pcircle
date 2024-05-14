@@ -12,10 +12,10 @@ import argparse
 import stat
 import sys
 import signal
-import cPickle as pickle
+import _pickle as cPickle
 import shutil
 from mpi4py import MPI
-from cStringIO import StringIO
+from io import StringIO
 
 from circle import Circle
 from _version import get_versions
@@ -127,7 +127,7 @@ class Checksum(BaseTask):
         f[0] path f[1] mode f[2] size - we enq all in one shot
         CMD = copy src  dest  off_start  last_chunk
         """
-        chunks = f.st_size / self.chunksize
+        chunks = f.st_size // self.chunksize
         remaining = f.st_size % self.chunksize
 
         workcnt = 0
@@ -200,9 +200,9 @@ class Checksum(BaseTask):
         os.lseek(fd, ck.offset, os.SEEK_SET)
         digest = hashlib.sha1()
         blocksize = 4*1024*1024 # 4MiB block
-        blockcount = ck.length / blocksize
+        blockcount = ck.length // blocksize
         remaining = ck.length % blocksize
-        for _ in xrange(blockcount):
+        for _ in range(blockcount):
             digest.update(readn(fd, blocksize))
         if remaining > 0:
             digest.update(readn(fd, remaining))
@@ -290,7 +290,7 @@ def export_checksum(chunks):
         c.filename = os.path.relpath(c.filename, start=args.path)
 
     with open(ex_path, "wb") as f:
-        pickle.dump(chunks, f, pickle.HIGHEST_PROTOCOL)
+        cPickle.dump(chunks, f, -1)
 
     return os.path.basename(ex_path)
 
@@ -386,7 +386,7 @@ def main():
     if circle.rank > 0:
         circle.comm.send(fcheck.bfsign.bitarray, dest=0)
     else:
-        for p in xrange(1, circle.comm.size):
+        for p in range(1, circle.comm.size):
             other_bitarray = circle.comm.recv(source=p)
             fcheck.bfsign.or_bf(other_bitarray)
     circle.comm.Barrier()

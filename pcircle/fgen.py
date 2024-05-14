@@ -37,13 +37,13 @@ def conv_mb(size):
     if num == '' or unit == '':
         print("parse error: %s" % size)
         sys.exit(1)
-    if string.upper(unit[0]) == 'K':
+    if unit[0].upper() == 'K':
         return int(num)
-    if string.upper(unit[0]) == 'M':
+    if unit[0].upper() == 'M':
         return int(num) * 1024
-    elif string.upper(unit[0]) == 'G':
+    elif unit[0].upper() == 'G':
         return int(num) * 1024 * 1024
-    elif string.upper(unit[0]) == 'T':
+    elif unit[0].upper() == 'T':
         return int(num) * 1024 * 1024 * 1024
     else:
         print("Unknown size: %s" % size)

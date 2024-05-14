@@ -9,7 +9,7 @@ import traceback
 import datetime
 import argparse
 
-from pcircle.globals import G
+from globals import G
 from pcircle.fdef import FileItem
 
 __author__ = 'Feiyi Wang'
@@ -310,7 +310,6 @@ def check_src2(infiles, mode=os.R_OK):
         # set up "dirname" for FileItem, so later we know how to construct
         # destination path when in "file2dir" mode
         elepath = os.path.realpath(os.path.expanduser(ele))
-
         if os.path.exists(elepath) and os.access(elepath, mode):
             ret.append(elepath)
         else:

@@ -49,12 +49,12 @@ Reduce Note:
     (3) reduce_finish(): I don't see this is in use today.
 
 """
-
 from pcircle import utils
-from pcircle.globals import T, G
+from globals import T, G
 from pcircle.dbstore import DbStore
 from pcircle.utils import getLogger
-from pcircle.token import Token
+#from pcircle.token import Token
+from pcircle.ptoken import Token
 from builtins import range
 
 DB_BUFSIZE = 10000
@@ -218,7 +218,6 @@ class Circle:
 
     def begin(self, task):
         """ entry point to work """
-
         self.task = task
         self.task.create()
         self.comm.barrier()

@@ -9,7 +9,7 @@ SLEEP = 0.1
 
 def readn(fd, size):
     tries = 0
-    ret = ''
+    ret = bytearray()
     while len(ret) < size:
         try:
             buf = os.read(fd, size - len(ret))

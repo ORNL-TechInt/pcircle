@@ -18,21 +18,24 @@ import versioneer
 import sys
 
 requires = [
-    'cffi>=1.2.1',
-    'mpi4py>=1.3.1',
-    'pyxattr>=0.5.1',
-    'scandir>=1.1',
-    'numpy>=1.7.1',
-    'bitarray>=0.8.1'
+    'cffi>=1.11.5',
+    'mpi4py>=3.1.5',
+    'xattr>=0.10.1',
+    'scandir>=1.10.0',
+    'numpy>=1.19.5',
+    'bitarray>=2.9.0',
+    'future>=0.18.3'
 ]
 
 details = """
 More details on the package
 """
 
+print("Version:", versioneer.get_version())
+
 setuptools.setup(name='pcircle',
                  description="A parallel file system tool suite",
-                 url="http://github.com/ORNL-TechInt/pcircle",
+                 url="https://github.com/fwang2/pcircle/tree/master",
                  license="Apache",
                  author='Feiyi Wang',
                  author_email='fwang2@ornl.gov',
@@ -54,10 +57,11 @@ setuptools.setup(name='pcircle',
                      'Development Status :: 3 - Beta',
                      'Intended Audience :: System Administrators',
                      'Topic :: System :: Monitoring',
-                     'Programming Language :: Python :: 2.7',
+                     'Programming Language :: Python :: 3.6',
                  ],
                  install_requires=requires,
                  long_description=details,
                  version=versioneer.get_version(),
                  cmdclass=versioneer.get_cmdclass(),
                  )
+
